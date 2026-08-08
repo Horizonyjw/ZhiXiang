@@ -1,0 +1,29 @@
+# U-Net 基线占位配置
+# 说明：Tin/Tout/H/W 等为开发占位，待组内确认真实数据设置后替换。
+# 不得把本文件中的占位值当作已确认的任务设定。
+
+experiment_id: "20260809-unet-placeholder-01"
+model_name: unet
+notes: "占位配置，仅用于随机张量前向与人工样本过拟合脚手架"
+
+# ---- 待组内确认 ----
+tin: 5          # 历史输入帧数【待确认】
+tout: 5         # 未来预测帧数【待确认】
+in_channels: 1  # 单通道回波【待确认】
+height: 128     # 空间高【待确认 / 需能被 2^depth 整除】
+width: 128      # 空间宽【待确认 / 需能被 2^depth 整除】
+
+# ---- 模型结构 ----
+base_channels: 32
+depth: 4
+
+# ---- 训练脚手架（人工数据）----
+seed: 42
+num_samples: 12
+batch_size: 4
+epochs: 50
+learning_rate: 0.001
+device: auto    # auto | cuda | cpu
+
+# ---- 结果保存（相对仓库根目录）----
+output_dir: "results/20260809-unet-placeholder-01"

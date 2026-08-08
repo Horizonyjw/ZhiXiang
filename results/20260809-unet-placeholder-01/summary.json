@@ -1,0 +1,12 @@
+{
+  "experiment_id": "20260809-unet-placeholder-01",
+  "device": "cuda",
+  "epochs": 50,
+  "num_samples": 12,
+  "first_mse": 0.5865455071131388,
+  "last_mse": 0.005087861015150945,
+  "loss_decreased": true,
+  "checkpoint": "results\\20260809-unet-placeholder-01\\checkpoints\\unet_toy_last.pt",
+  "loss_csv": "results\\20260809-unet-placeholder-01\\train_loss.csv",
+  "note": "人工数据脚手架结果，不能作为正式对比实验"
+}
