@@ -1,0 +1,24 @@
+# FNO 接口测试占位配置
+# 本阶段仅用于随机张量前向，不代表正式训练超参已确认。
+
+experiment_id: "20260809-fno-placeholder-01"
+model_name: fno
+notes: "占位配置，仅用于 FNO 随机张量前向与接口适配验证"
+
+# ---- 待组内确认 ----
+tin: 5
+tout: 5
+in_channels: 1
+height: 128
+width: 128
+
+# ---- FNO 结构（接口测试默认值）----
+# 注意：隐藏通道数勿与空间 width 字段重名
+fno_width: 32
+modes1: 12
+modes2: 12
+n_layers: 4
+
+# ---- 运行 ----
+seed: 42
+device: auto    # auto | cuda | cpu

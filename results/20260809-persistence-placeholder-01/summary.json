@@ -1,0 +1,34 @@
+{
+  "experiment_id": "20260809-persistence-placeholder-01",
+  "model_name": "persistence",
+  "data_mode": "random_tensor",
+  "tin": 5,
+  "tout": 5,
+  "in_channels": 1,
+  "device": "cuda",
+  "inference_seconds": 0.13315849999980856,
+  "git_branch_hint": "see git rev-parse HEAD",
+  "warning": "随机张量占位，不是真实雷达数据，不得写入正式联调结论",
+  "input_shape": [
+    2,
+    5,
+    1,
+    128,
+    128
+  ],
+  "target_shape": [
+    2,
+    5,
+    1,
+    128,
+    128
+  ],
+  "prediction_shape": [
+    2,
+    5,
+    1,
+    128,
+    128
+  ],
+  "predictions_path": "results/20260809-persistence-placeholder-01/predictions.npz"
+}

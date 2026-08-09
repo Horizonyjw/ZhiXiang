@@ -1,0 +1,14 @@
+# 智象 Week1.1 统一依赖（由环境负责人锁定）
+# 安装示例见 docs/环境安装与启动说明.md
+#
+# 说明：
+# - torch 的 CUDA 轮子需按本机 CUDA 驱动选择官方 index，勿直接 pip install torch 默认 CPU 包后强行改版本
+# - 当前负责人验证环境：Python 3.13.5 / torch 2.8.0+cu129 / CUDA 12.9
+
+numpy>=1.26,<3
+PyYAML>=6.0,<7
+torch>=2.2
+
+# 可选：可视化与评测后续阶段再统一锁定
+# matplotlib>=3.8
+# scipy>=1.11

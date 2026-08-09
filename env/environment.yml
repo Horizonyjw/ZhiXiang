@@ -1,0 +1,14 @@
+# Conda 环境模板（可选）。若使用 venv + pip，请参考 env/requirements.txt。
+name: zhixiang
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python>=3.10,<3.14
+  - numpy>=1.26,<3
+  - pyyaml>=6.0,<7
+  - pip
+  - pip:
+      # 请按本机 CUDA 驱动从 https://pytorch.org 选择对应命令安装 torch
+      - torch>=2.2

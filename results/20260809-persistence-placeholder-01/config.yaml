@@ -1,0 +1,21 @@
+# Persistence 基线占位配置
+# Tin/Tout/H/W 为开发占位，待组内确认真实数据设置后替换。
+
+experiment_id: "20260809-persistence-placeholder-01"
+model_name: persistence
+notes: "占位配置，用于随机张量前向与预测保存接口验证；不得当作真实数据联调结论"
+
+# ---- 待组内确认 ----
+tin: 5
+tout: 5
+in_channels: 1
+height: 128
+width: 128
+
+# ---- 运行 ----
+seed: 42
+batch_size: 2
+device: auto    # auto | cuda | cpu
+
+# ---- 结果保存 ----
+output_dir: "results/20260809-persistence-placeholder-01"
