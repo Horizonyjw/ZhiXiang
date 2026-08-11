@@ -1,0 +1,33 @@
+{
+  "standardization_ready": false,
+  "checks": {
+    "standardized_frame_count_match": false,
+    "no_standardization_rejects": false,
+    "train_sample_match": false,
+    "val_sample_match": false,
+    "test_sample_match": false,
+    "total_sample_match": false
+  },
+  "standardized_frames": 4964,
+  "rejected_frames": 2432,
+  "frame_split_counts": {
+    "train": 4964
+  },
+  "sample_split_counts": {
+    "train": 4884
+  },
+  "sample_total": 4884,
+  "tensor_format": {
+    "shape": [
+      1,
+      352,
+      512
+    ],
+    "dtype": "float32",
+    "value_range": [
+      0.0,
+      1.0
+    ],
+    "physical_unit": "normalized_grayscale_proxy_NOT_dBZ"
+  }
+}
