@@ -1,0 +1,63 @@
+{
+  "data_version": "radar_v1",
+  "raw_filename_example": "Z_RADA_C_BABJ_P_ACHN_CREF000_20260123180000_12.2_54.2_73.0_135.0.png",
+  "filename_fields": {
+    "center_code": "BABJ",
+    "product_code": "ACHN_CREF000",
+    "timestamp": "20260123180000",
+    "spatial_coverage": [
+      "lat_min",
+      "lat_max",
+      "lon_min",
+      "lon_max"
+    ]
+  },
+  "model_interface": {
+    "Tin": 5,
+    "Tout": 3,
+    "C": 1,
+    "H": 352,
+    "W": 512,
+    "batch_inputs": "[B,5,1,352,512] float32",
+    "batch_targets": "[B,3,1,352,512] float32"
+  },
+  "time": {
+    "interval_seconds": 360,
+    "tolerance_seconds": 60,
+    "missing_frame_rule": "超过容差即断开连续片段，不跨缺帧构造样本",
+    "time_standard": "UNCONFIRMED"
+  },
+  "preprocess": {
+    "steps": [
+      "读取RGBA",
+      "RGB除以255归一化到[0,1]",
+      "0.299R+0.587G+0.114B转单通道灰度",
+      "alpha无效显示区域置0",
+      "缩放到352x512"
+    ],
+    "value_range": [
+      0.0,
+      1.0
+    ],
+    "physical_unit": "normalized_grayscale_proxy_NOT_dBZ",
+    "normalization_status": "already_normalized"
+  },
+  "split": {
+    "method": "chronological",
+    "train_end": "2026-02-14 12:06:00",
+    "val_end": "2026-02-20 16:00:00",
+    "no_cross_split_windows": true
+  },
+  "dataloader": {
+    "returns": [
+      "inputs",
+      "targets",
+      "metadata"
+    ],
+    "dataset_class": "RadarDataset"
+  },
+  "sharing": {
+    "cloud_upload": "allowed",
+    "public_git": "UNCONFIRMED"
+  }
+}

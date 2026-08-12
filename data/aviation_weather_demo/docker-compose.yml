@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: aviation_weather_db
+    environment:
+      POSTGRES_DB: weather_db
+      POSTGRES_USER: weather
+      POSTGRES_PASSWORD: weather123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weather -d weather_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: .
+    container_name: aviation_weather_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    working_dir: /code
+    volumes:
+      - .:/code
+      - ./data:/code/data
+      - ./reports:/code/reports
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://weather:weather123@db:5432/weather_db
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -1,0 +1,67 @@
+{
+  "contract_version": "B1-2026-08-09",
+  "source": {
+    "name": "系统历史雷达拼图 PNG 图像序列",
+    "reference_time_range": [
+      "2026-01-23 18:00:00",
+      "2026-02-23 18:00:00"
+    ],
+    "reference_raw_frame_count": 7396,
+    "reference_expected_frame_count": 7441,
+    "reference_missing_frame_count": 45,
+    "reference_missing_rate": 0.00605,
+    "reference_segment_count": 14,
+    "reference_longest_segment_frames": 3378
+  },
+  "sample": {
+    "Tin": 5,
+    "Tout": 3,
+    "C": 1,
+    "H": 352,
+    "W": 512,
+    "interval_minutes": 6,
+    "batch_layout": "[B, T, C, H, W]",
+    "dtype": "float32"
+  },
+  "value": {
+    "representation": "normalized grayscale image intensity",
+    "range": [
+      0.0,
+      1.0
+    ],
+    "physical_unit": "none; current pipeline does not invert PNG color to physical dBZ",
+    "normalization": "RGB / 255 -> grayscale; alpha-invalid pixels set to 0",
+    "missing_time": "not imputed; a time gap breaks the sequence and windows never cross it",
+    "no_echo": "not explicitly defined in uploaded source documents; current loader does not invent a special no-echo code",
+    "inverse_normalization_for_eval": "not available in current image-only pipeline because there is no physical dBZ inverse mapping"
+  },
+  "dataloader": {
+    "module": "dataset.dataloader",
+    "function": "create_dataloader",
+    "returns": [
+      "inputs",
+      "targets",
+      "metadata"
+    ],
+    "inputs_shape": "[B, 5, 1, 352, 512]",
+    "targets_shape": "[B, 3, 1, 352, 512]",
+    "metadata_fields": [
+      "sample_id",
+      "split",
+      "start_time",
+      "input_times",
+      "target_times"
+    ]
+  },
+  "split": {
+    "current_implementation": "all valid windows are ordered by start time, then assigned 70% train / 20% validation / 10% test",
+    "by_weather_process": false,
+    "source_status": "uploaded source documents do not specify a weather-process split rule; this 70/20/10 rule is an implementation convention and should be unified later if the team defines a process-based split"
+  },
+  "git_and_permission": {
+    "code": "may be version-controlled in the project repository",
+    "raw_radar_png": "do not upload to public Git until the data provider/mentor confirms permission",
+    "generated_manifests_and_reports": "excluded by .gitignore by default",
+    "citation_requirement": "pending confirmation from data provider/mentor; uploaded task document explicitly asks this to be verified"
+  }
+}

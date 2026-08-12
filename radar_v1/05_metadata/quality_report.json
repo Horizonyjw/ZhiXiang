@@ -1,0 +1,57 @@
+{
+  "delivery_ready": true,
+  "checks": {
+    "png_count_match": true,
+    "accepted_all_png": true,
+    "no_rejected_png": true,
+    "single_center": true,
+    "single_product": true,
+    "single_spatial_coverage": true,
+    "sample_train_match": true,
+    "sample_val_match": true,
+    "sample_test_match": true,
+    "sample_total_match": true
+  },
+  "found_png": 7396,
+  "accepted_png": 7396,
+  "rejected_png": 0,
+  "time_range": [
+    "2026-01-23 18:00:00",
+    "2026-02-23 18:00:00"
+  ],
+  "segment_count": 14,
+  "continuity_break_count": 13,
+  "gap_seconds_counts": {
+    "360": 7382,
+    "720": 8,
+    "1080": 3,
+    "2520": 1,
+    "9360": 1
+  },
+  "center_counts": {
+    "BABJ": 7396
+  },
+  "product_counts": {
+    "ACHN_CREF000": 7396
+  },
+  "spatial_coverage_counts": {
+    "(12.2, 54.2, 73.0, 135.0)": 7396
+  },
+  "sample_split_counts": {
+    "train": 5097,
+    "val": 1472,
+    "test": 733
+  },
+  "sample_total": 7302,
+  "expected_sample_counts": {
+    "train": 5097,
+    "val": 1472,
+    "test": 733,
+    "total": 7302
+  },
+  "notes": [
+    "资料时次时区在现有两份方案中未明确，因此本包保存为资料时次字符串，不擅自标UTC。",
+    "当前数值为归一化灰度强度代理量，不是dBZ。",
+    "bbox字段顺序按示例数值推断；如项目内部定义不同，只修改config.json的bbox_order。"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "data_version": "radar_v1",
+  "expected": {
+    "png_count": 7396,
+    "width": 3100,
+    "height": 2100,
+    "mode": "RGBA",
+    "sample_counts": {
+      "train": 5097,
+      "val": 1472,
+      "test": 733,
+      "total": 7302
+    }
+  },
+  "task": {
+    "tin": 5,
+    "tout": 3,
+    "interval_seconds": 360,
+    "tolerance_seconds": 60,
+    "target_height": 352,
+    "target_width": 512,
+    "channels": 1
+  },
+  "split": {
+    "train_end": "2026-02-14 12:06:00",
+    "val_end": "2026-02-20 16:00:00"
+  },
+  "filename": {
+    "bbox_order": [
+      "lat_min",
+      "lat_max",
+      "lon_min",
+      "lon_max"
+    ]
+  },
+  "preprocess": {
+    "rgb_divisor": 255.0,
+    "gray_formula": "0.299R + 0.587G + 0.114B",
+    "alpha_invalid_threshold": 0,
+    "invalid_fill_value": 0.0,
+    "resize_interpolation": "bilinear"
+  },
+  "metadata": {
+    "time_standard": "UTC",
+    "physical_unit": "normalized_grayscale_proxy_NOT_dBZ",
+    "cloud_upload": "allowed_by_user",
+    "public_git": "UNCONFIRMED"
+  }
+}

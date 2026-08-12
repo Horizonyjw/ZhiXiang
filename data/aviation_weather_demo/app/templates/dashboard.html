@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>航空气象真实数据底座</title>
+<style>
+body{font-family:Arial,"Microsoft YaHei",sans-serif;margin:0;background:#f5f7fb;color:#1f2937}
+header{background:#fff;padding:20px 28px;border-bottom:1px solid #ddd}
+main{max-width:1180px;margin:24px auto;padding:0 18px 50px}
+.panel,.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+.panel{margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
+.num{font-size:28px;font-weight:700;margin-top:8px}.muted{color:#6b7280}
+button{background:#111827;color:#fff;border:0;border-radius:8px;padding:10px 14px;cursor:pointer;margin:4px}
+input,textarea{padding:9px;border:1px solid #ccc;border-radius:8px;margin:4px;min-width:220px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;border-bottom:1px solid #eee;font-size:14px}
+a{color:#2563eb}code{background:#eef2ff;padding:2px 5px;border-radius:4px}
+.warn{background:#fff7ed;border-color:#fdba74}
+</style>
+</head>
+<body>
+<header><h1>航空气象真实数据底座</h1>
+<div class="muted">真实 PNG 扫描 · 数据质量 · 全量 5→3 样本 · DataLoader manifest</div></header>
+<main>
+
+<section class="panel warn">
+<h2>材料中的真实数据基准</h2>
+<p>本页不再生成模拟数据。下面只显示此前上传《002-数据处理方案》中用于核对的真实统计值。</p>
+<div class="grid">
+<div class="card"><div class="muted">材料记录 PNG</div><div class="num">{{ reference.frame_count }}</div></div>
+<div class="card"><div class="muted">理论帧数</div><div class="num">{{ reference.expected_frame_count }}</div></div>
+<div class="card"><div class="muted">缺失帧</div><div class="num">{{ reference.missing_frame_count }}</div></div>
+<div class="card"><div class="muted">缺测率</div><div class="num">{{ "%.3f"|format(reference.missing_rate*100) }}%</div></div>
+<div class="card"><div class="muted">连续片段</div><div class="num">{{ reference.segment_count }}</div></div>
+<div class="card"><div class="muted">原图</div><div class="num" style="font-size:20px">{{ reference.original_width }}×{{ reference.original_height }}</div></div>
+</div>
+<p class="muted">时间范围：{{ reference.time_start }} ～ {{ reference.time_end }}；主体间隔 6 分钟；RGBA PNG；输入 5 帧、预测 3 帧；训练前缩放到 352×512 单通道灰度；不做 dBZ 反演。</p>
+</section>
+
+<section class="panel">
+<h2>1. 扫描本地真实雷达 PNG</h2>
+<p class="muted">把真实图片放入 <code>data/radar_raw</code>。尺寸或模式异常只标记，不丢弃；无法读图/无法解析时次的文件会进入问题清单。</p>
+<input id="dname" value="系统历史雷达拼图_全量">
+<input id="dpath" value="data/radar_raw">
+<button onclick="scan()">开始真实数据扫描</button>
+<a href="/docs" target="_blank">Swagger</a>　
+<a href="/health" target="_blank">健康检查</a>
+<pre id="msg" class="muted"></pre>
+</section>
+
+{% if dataset %}
+<section class="panel"><h2>当前真实数据集：{{ dataset.name }}</h2>
+<div class="muted">{{ dataset.start_time }} ～ {{ dataset.end_time }}</div>
+<button onclick="processAll({{ dataset.id }})">2. 构建全部可用 5→3 样本并导出报告</button>
+</section>
+
+<section class="grid">
+<div class="card"><div class="muted">可读取有时次帧</div><div class="num">{{ dataset.frame_count }}</div></div>
+<div class="card"><div class="muted">理论帧</div><div class="num">{{ dataset.expected_count }}</div></div>
+<div class="card"><div class="muted">缺失帧</div><div class="num">{{ dataset.missing_count }}</div></div>
+<div class="card"><div class="muted">缺测率</div><div class="num">{{ "%.3f"|format(dataset.missing_rate*100) }}%</div></div>
+<div class="card"><div class="muted">连续片段</div><div class="num">{{ dataset.segment_count }}</div></div>
+<div class="card"><div class="muted">全部可用样本</div><div class="num">{{ dataset.sample_count }}</div></div>
+</section>
+
+<section class="grid">
+<div class="card"><div class="muted">训练</div><div class="num">{{ split_counts.train }}</div></div>
+<div class="card"><div class="muted">验证</div><div class="num">{{ split_counts.validation }}</div></div>
+<div class="card"><div class="muted">测试</div><div class="num">{{ split_counts.test }}</div></div>
+</section>
+
+<section class="panel"><h2>连续片段（前20个）</h2><table>
+<tr><th>ID</th><th>开始</th><th>结束</th><th>帧数</th></tr>
+{% for x in segments %}<tr><td>{{ x.id }}</td><td>{{ x.start_time }}</td><td>{{ x.end_time }}</td><td>{{ x.frame_count }}</td></tr>
+{% else %}<tr><td colspan="4">暂无</td></tr>{% endfor %}
+</table></section>
+
+<section class="panel"><h2>全量样本中的前10条索引</h2><table>
+<tr><th>ID</th><th>集合</th><th>开始时间</th><th>输入ID</th><th>目标ID</th></tr>
+{% for x in samples %}<tr><td>{{ x.id }}</td><td>{{ x.split }}</td><td>{{ x.start_time }}</td><td>{{ x.input_ids }}</td><td>{{ x.target_ids }}</td></tr>
+{% else %}<tr><td colspan="5">尚未构建样本</td></tr>{% endfor %}
+</table></section>
+{% endif %}
+
+<section class="panel"><h2>实验登记</h2>
+<input id="ename" placeholder="实验名称">
+<input id="model" value="persistence_baseline">
+<textarea id="hyp" placeholder="研究假设"></textarea>
+<button onclick="experiment()">保存实验</button>
+</section>
+
+<section class="panel"><h2>最近实验</h2><table>
+<tr><th>ID</th><th>名称</th><th>模型</th><th>状态</th><th>假设</th></tr>
+{% for x in experiments %}<tr><td>{{ x.id }}</td><td>{{ x.name }}</td><td>{{ x.model_name }}</td><td>{{ x.status }}</td><td>{{ x.hypothesis }}</td></tr>
+{% else %}<tr><td colspan="5">暂无实验</td></tr>{% endfor %}
+</table></section>
+</main>
+
+<script>
+async function show(r){
+  let b=await r.json();
+  document.getElementById('msg').textContent=JSON.stringify(b,null,2);
+  if(r.ok)setTimeout(()=>location.reload(),700)
+}
+async function scan(){
+  show(await fetch('/api/scan',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:dname.value,path:dpath.value})
+  }))
+}
+async function processAll(id){
+  show(await fetch(`/api/process/${id}`,{method:'POST'}))
+}
+async function experiment(){
+  show(await fetch('/api/experiments',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      name:ename.value,
+      dataset_id:{% if dataset %}{{ dataset.id }}{% else %}null{% endif %},
+      model_name:model.value,
+      hypothesis:hyp.value,
+      config:{}
+    })
+  }))
+}
+</script>
+</body></html>
