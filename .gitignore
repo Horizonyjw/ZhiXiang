@@ -15,6 +15,8 @@ data/raw/
 data/processed/
 results/*/checkpoints/
 results/*/predictions.npz
+results/*/predictions_untrained.npz
+results/*/predictions_toy.pt
 
 # 编辑器与系统
 .idea/
