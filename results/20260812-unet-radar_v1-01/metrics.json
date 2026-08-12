@@ -1,0 +1,36 @@
+{
+  "threshold_dbz": 20.0,
+  "overall": {
+    "mae": 0.0009515411802567542,
+    "mse": 3.595084490370937e-05,
+    "csi": null,
+    "pod": null,
+    "far": null
+  },
+  "per_lead_time": [
+    {
+      "step": 1,
+      "mae": 0.0007118805660866201,
+      "mse": 3.367905810591765e-05,
+      "csi": null,
+      "pod": null,
+      "far": null
+    },
+    {
+      "step": 2,
+      "mae": 0.0011963008437305689,
+      "mse": 3.315495268907398e-05,
+      "csi": null,
+      "pod": null,
+      "far": null
+    },
+    {
+      "step": 3,
+      "mae": 0.0009464437607675791,
+      "mse": 4.101846934645437e-05,
+      "csi": null,
+      "pod": null,
+      "far": null
+    }
+  ]
+}

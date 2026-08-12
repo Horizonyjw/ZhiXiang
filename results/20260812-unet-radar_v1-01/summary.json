@@ -1,0 +1,32 @@
+{
+  "experiment_id": "20260812-unet-radar_v1-01",
+  "data_version": "radar_v1",
+  "device": "cuda",
+  "num_samples": 16,
+  "sample_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "epochs": 40,
+  "first_mse": 0.03377552720485255,
+  "last_mse": 3.921236816495366e-05,
+  "loss_decreased": true,
+  "checkpoint": "results\\20260812-unet-radar_v1-01\\checkpoints\\unet_overfit.pt",
+  "loss_csv": "results\\20260812-unet-radar_v1-01\\train_loss.csv",
+  "predictions": "results\\20260812-unet-radar_v1-01\\predictions.npz",
+  "physical_unit": "normalized_grayscale_proxy_NOT_dBZ"
+}

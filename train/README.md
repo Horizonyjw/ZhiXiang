@@ -6,8 +6,10 @@
 
 | 脚本 | 用途 |
 | --- | --- |
-| `test_unet_forward.py` | 随机张量前向，检查输出维度（任务 A5） |
-| `overfit_unet_toy.py` | 固定人工样本过拟合脚手架（任务 A6） |
+| `test_unet_forward.py` | 随机张量前向（占位配置） |
+| `test_handoff_forward.py` | radar_v1 handoff 真实前向 |
+| `overfit_unet_toy.py` | 人工数据过拟合脚手架 |
+| `overfit_unet_handoff.py` | radar_v1 handoff 小样本过拟合 |
 | `export_predictions.py` | 导出 `predictions.npz` 供评测读取（对接 `evaluate.run_from_npz`） |
 | `config_utils.py` | 配置读取与 device 解析 |
 
