@@ -8,7 +8,7 @@
 | --- | --- |
 | `test_unet_forward.py` | 随机张量前向，检查输出维度（任务 A5） |
 | `overfit_unet_toy.py` | 固定人工样本过拟合脚手架（任务 A6） |
-| `export_predictions.py` | 导出 `predictions.npz` 供评测读取（任务 B3） |
+| `export_predictions.py` | 导出 `predictions.npz` 供评测读取（对接 `evaluate.run_from_npz`） |
 | `config_utils.py` | 配置读取与 device 解析 |
 
 ## 命令

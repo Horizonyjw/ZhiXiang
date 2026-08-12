@@ -1,13 +1,12 @@
 """
 将预测结果导出为评测可读的 npz（任务 B3 预留格式）。
 
-约定字段（交张嘉荣前可再确认 key 名）:
-  inputs, targets, predictions  — float32 数组
+约定字段（与 evaluate.run_from_npz 对齐）:
+  inputs, targets, predictions  — float32 数组，形状 [N, T, C, H, W]
   metadata_json                 — UTF-8 JSON 字符串（可选）
 
-用法示例:
-  from train.export_predictions import save_predictions_npz
-  save_predictions_npz(out_path, inputs, targets, predictions, metadata=...)
+评测读取：
+  .\\.venv\\Scripts\\python.exe -m evaluate.run_from_npz --npz <path> --plot
 """
 
 from __future__ import annotations

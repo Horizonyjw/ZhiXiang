@@ -1,8 +1,19 @@
-# visualize｜可视化模块占位
+# visualize｜结果可视化
 
-**状态：未实现。**
+**状态：已接入 zjr 分支结果图模板。**
 
-本目录预留给后续输入序列、真实未来序列、模型预测、误差图和逐时效指标图的绘制功能。
+## 文件
 
-当前不包含图像模板、示例图片或任何实验可视化结果。
+| 文件 | 说明 |
+| --- | --- |
+| `plot_results.py` | 序列对比图 + 逐时效指标图（来源：`origin/zjr`） |
 
+依赖：`numpy`、`Pillow`（当前环境随 torchvision 已具备）。
+
+通常由评测入口调用：
+
+```powershell
+.\.venv\Scripts\python.exe -m evaluate.run_from_npz --npz ... --plot
+```
+
+输出默认写入 `results/<experiment_id>/figures/`。
