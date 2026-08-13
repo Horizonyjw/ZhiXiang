@@ -1,8 +1,11 @@
 {
-  "mae": 0.0009515411802567542,
-  "mse": 3.595084490370937e-05,
+  "evaluation_version": "v0.2",
+  "data_scale": "normalized_grayscale_[0,1]",
+  "mae": 0.0005096204602481748,
+  "mse": 3.252675068014589e-05,
   "csi": null,
   "pod": null,
   "far": null,
-  "warning": "Data is [0,1] grayscale proxy NOT dBZ. CSI/POD/FAR at 20.0 are NOT formal. Use MAE/MSE only until eval thresholds are unified."
+  "predictions_clipped_to_unit_interval": true,
+  "warning": "Official eval is v0.2: MAE/MSE on [0,1] grayscale. CSI/POD/FAR are not computed (no RGB-dBZ colorbar). Do not interpret null as 0. Linear-head outputs slightly outside [0,1] were clipped before scoring."
 }

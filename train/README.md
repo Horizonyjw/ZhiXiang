@@ -31,4 +31,5 @@
 
 - 人工数据结果**不能**作为正式模型对比结论；
 - 真实样本前向 / 正式训练需等待数据接口确认；
-- 大权重与预测文件默认不提交 Git。
+- 大权重与预测文件默认不提交 Git；
+- 评测入口为 v0.2：`python -m evaluate.run_from_npz --npz results/<id>/predictions.npz --plot`。

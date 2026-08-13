@@ -137,7 +137,7 @@ def train(cfg: dict) -> Path:
         "physical_unit": cfg.get("physical_unit", "normalized_grayscale_proxy_NOT_dBZ"),
         "sample_indices": sample_idx,
         "sample_metadata": meta_list,
-        "note": "MAE/MSE only for grayscale proxy; CSI@20dBZ not formal",
+        "note": "eval v0.2: MAE/MSE on [0,1] grayscale; CSI/POD/FAR not computed",
     }
     pred_path = save_predictions_npz(
         out_dir / "predictions.npz",

@@ -1,4 +1,8 @@
-"""第一阶段统一评测：MAE、MSE、CSI、POD、FAR。"""
+"""v0.1 历史评测（已弃用）。
+
+请使用 `evaluate.metrics_v0.2.py`（经 `from evaluate import evaluate`）：灰度 [0,1] 上计算 MAE/MSE，
+CSI/POD/FAR 暂不计算。本文件保留 20 dBZ 阈值实现，仅供对照，不再作为官方入口。
+"""
 
 import csv
 import json

@@ -1,11 +1,10 @@
 """
-从 predictions.npz 读取预测并调用统一评测（对接 zjr 分支 metrics）。
+从 predictions.npz 读取预测并调用统一评测（v0.2）。
 
 用法（仓库根目录）:
   .\\.venv\\Scripts\\python.exe -m evaluate.run_from_npz ^
       --npz results/<experiment_id>/predictions.npz ^
       --output-dir results/<experiment_id> ^
-      --threshold 20.0 ^
       --plot
 """
 
@@ -22,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from evaluate.metrics import evaluate, save_metrics
+from evaluate import evaluate, save_metrics
 
 
 def load_predictions_npz(path: Path) -> dict:
@@ -44,19 +43,51 @@ def load_predictions_npz(path: Path) -> dict:
     return payload
 
 
+def resolve_experiment_id(payload: dict, output_dir: Path, explicit: str | None) -> str:
+    if explicit:
+        return explicit
+    metadata = payload.get("metadata") or {}
+    if isinstance(metadata, dict) and metadata.get("experiment_id"):
+        return str(metadata["experiment_id"])
+    return output_dir.name
+
+
+def clip_to_unit_interval(array: np.ndarray, name: str) -> tuple[np.ndarray, bool]:
+    """线性头可能略超出 [0,1]；评测 v0.2 要求有限值必须在该区间。"""
+    finite = np.isfinite(array)
+    if not np.any(finite):
+        return array, False
+    finite_vals = array[finite]
+    out_of_range = bool(np.any(finite_vals < 0.0) or np.any(finite_vals > 1.0))
+    if not out_of_range:
+        return array, False
+    clipped = np.clip(array, 0.0, 1.0)
+    print(f"warning: {name} 存在超出 [0,1] 的有限值，已 clip 后再评测")
+    return clipped, True
+
+
 def run(
     npz_path: Path,
     output_dir: Path,
-    threshold_dbz: float = 20.0,
     plot: bool = False,
     sample_index: int = 0,
+    experiment_id: str | None = None,
+    overwrite: bool = False,
+    clip: bool = True,
 ) -> dict:
     payload = load_predictions_npz(npz_path)
-    metrics = evaluate(
-        payload["predictions"],
-        payload["targets"],
-        threshold_dbz=threshold_dbz,
-    )
+    predictions = payload["predictions"]
+    targets = payload["targets"]
+    clipped_keys = []
+    if clip:
+        predictions, pred_clipped = clip_to_unit_interval(predictions, "预测值")
+        targets, tgt_clipped = clip_to_unit_interval(targets, "真值")
+        if pred_clipped:
+            clipped_keys.append("predictions")
+        if tgt_clipped:
+            clipped_keys.append("targets")
+
+    metrics = evaluate(predictions, targets)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / "metrics.json"
@@ -64,12 +95,15 @@ def run(
     save_metrics(metrics, json_path)
     save_metrics(metrics, csv_path)
 
+    exp_id = resolve_experiment_id(payload, output_dir, experiment_id)
     result = {
         "npz": str(npz_path),
         "metrics_json": str(json_path),
         "metrics_csv": str(csv_path),
+        "evaluation_version": metrics.get("evaluation_version"),
+        "experiment_id": exp_id,
         "overall": metrics["overall"],
-        "threshold_dbz": threshold_dbz,
+        "clipped_to_unit_interval": clipped_keys,
     }
 
     if plot:
@@ -80,11 +114,13 @@ def run(
         figures_dir = output_dir / "figures"
         paths = make_result_figures(
             payload["inputs"],
-            payload["targets"],
-            payload["predictions"],
+            targets,
+            predictions,
             metrics,
             figures_dir,
+            experiment_id=exp_id,
             sample_index=sample_index,
+            overwrite=overwrite,
         )
         result["figures"] = paths
 
@@ -92,21 +128,30 @@ def run(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="从 predictions.npz 运行统一评测")
+    parser = argparse.ArgumentParser(description="从 predictions.npz 运行统一评测（v0.2）")
     parser.add_argument("--npz", required=True, help="predictions.npz 路径")
     parser.add_argument(
         "--output-dir",
         default=None,
         help="指标与图片输出目录（默认与 npz 同目录）",
     )
-    parser.add_argument(
-        "--threshold",
-        type=float,
-        default=20.0,
-        help="回波阈值（dBZ），默认 20.0，与评测说明 v0.1 一致",
-    )
     parser.add_argument("--plot", action="store_true", help="同时生成结果图")
     parser.add_argument("--sample-index", type=int, default=0, help="绘图使用的样本下标")
+    parser.add_argument(
+        "--experiment-id",
+        default=None,
+        help="结果图实验编号；默认读 npz metadata 或输出目录名",
+    )
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="允许覆盖已有结果图（默认不覆盖）",
+    )
+    parser.add_argument(
+        "--no-clip",
+        action="store_true",
+        help="不对超出 [0,1] 的值做 clip（可能触发评测报错）",
+    )
     args = parser.parse_args()
 
     npz_path = Path(args.npz)
@@ -119,9 +164,11 @@ def main() -> None:
     result = run(
         npz_path=npz_path,
         output_dir=output_dir,
-        threshold_dbz=args.threshold,
         plot=args.plot,
         sample_index=args.sample_index,
+        experiment_id=args.experiment_id,
+        overwrite=args.overwrite,
+        clip=not args.no_clip,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
