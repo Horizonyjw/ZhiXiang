@@ -1,10 +1,85 @@
 """雷达回波预测结果图模板"""
 
+import argparse
+import json
 import re
+import sys
 from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def make_result_figures_from_file(
+    predictions_path,
+    metrics_path=None,
+    output_dir=None,
+    experiment_id=None,
+    prediction_label="Model prediction",
+    lead_interval_minutes=6,
+    sample_index=0,
+    channel_index=0,
+    overwrite=False,
+):
+    """直接读取 predictions.npz 并生成约定的两张结果图。
+
+    默认优先从 metadata_json 读取 experiment_id；如果文件位于
+    results/<experiment_id>/predictions.npz，也可从父目录推断。
+    未显式传入 output_dir 时，图片保存到
+    results/<experiment_id>/figures/。
+    """
+    predictions_path = Path(predictions_path)
+    if not predictions_path.is_file():
+        raise FileNotFoundError(f"找不到预测文件：{predictions_path}")
+    if predictions_path.suffix.lower() != ".npz":
+        raise ValueError("输入文件必须以 .npz 结尾")
+
+    try:
+        with np.load(predictions_path, allow_pickle=False) as data:
+            required = ("inputs", "targets", "predictions")
+            missing = [key for key in required if key not in data]
+            if missing:
+                raise ValueError(
+                    f"NPZ 缺少必需字段：{', '.join(missing)}；"
+                    f"当前字段：{', '.join(data.files)}"
+                )
+            inputs = data["inputs"]
+            target = data["targets"]
+            prediction = data["predictions"]
+            metadata = _read_metadata_json(data)
+    except (OSError, EOFError) as error:
+        raise ValueError(f"无法读取 NPZ 文件：{predictions_path}") from error
+
+    experiment_id = _resolve_experiment_id(
+        experiment_id, metadata, predictions_path.parent
+    )
+    metrics = _resolve_metrics(
+        metrics_path, predictions_path, experiment_id, prediction, target
+    )
+    _validate_metrics(metrics, prediction.shape[1])
+
+    if output_dir is None:
+        if predictions_path.parent.name == experiment_id:
+            output_dir = predictions_path.parent / "figures"
+        else:
+            output_dir = PROJECT_ROOT / "results" / experiment_id / "figures"
+
+    return make_result_figures(
+        inputs,
+        target,
+        prediction,
+        metrics,
+        output_dir,
+        experiment_id,
+        prediction_label=prediction_label,
+        lead_interval_minutes=lead_interval_minutes,
+        sample_index=sample_index,
+        channel_index=channel_index,
+        overwrite=overwrite,
+    )
 
 
 def make_result_figures(
@@ -248,3 +323,103 @@ def _validate_display_options(prediction_label, lead_interval_minutes):
         raise ValueError("prediction_label 必须是非空字符串，例如 Persistence prediction")
     if not isinstance(lead_interval_minutes, int) or lead_interval_minutes <= 0:
         raise ValueError("lead_interval_minutes 必须是正整数")
+
+
+def _read_metadata_json(data):
+    if "metadata_json" not in data:
+        return {}
+    raw = data["metadata_json"]
+    if raw.size != 1:
+        raise ValueError("metadata_json 必须是单个 JSON 字符串")
+    try:
+        metadata = json.loads(str(raw.item()))
+    except (json.JSONDecodeError, TypeError, ValueError) as error:
+        raise ValueError("metadata_json 不是有效的 JSON") from error
+    if not isinstance(metadata, dict):
+        raise ValueError("metadata_json 的顶层结构必须是对象")
+    return metadata
+
+
+def _resolve_experiment_id(explicit_id, metadata, parent_dir):
+    candidates = [explicit_id, metadata.get("experiment_id")]
+    if parent_dir.name != "results":
+        candidates.append(parent_dir.name)
+    for candidate in candidates:
+        if candidate is None:
+            continue
+        _validate_experiment_id(candidate)
+        return candidate
+    raise ValueError(
+        "无法确定 experiment_id：请在 metadata_json 中提供，"
+        "将文件放入 results/<experiment_id>/，或显式传入"
+    )
+
+
+def _resolve_metrics(metrics_path, predictions_path, experiment_id, prediction, target):
+    if metrics_path is not None:
+        candidate_paths = [Path(metrics_path)]
+    else:
+        candidate_paths = [
+            predictions_path.parent / "metrics.json",
+            PROJECT_ROOT / "results" / experiment_id / "metrics.json",
+        ]
+    for path in candidate_paths:
+        if path.is_file():
+            try:
+                return json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as error:
+                raise ValueError(f"无法读取指标文件：{path}") from error
+    if metrics_path is not None:
+        raise FileNotFoundError(f"找不到指标文件：{metrics_path}")
+
+    if str(PROJECT_ROOT) not in sys.path:
+        sys.path.insert(0, str(PROJECT_ROOT))
+    from evaluate.metrics_v0_2 import evaluate
+
+    return evaluate(prediction, target)
+
+
+def _validate_metrics(metrics, expected_steps):
+    if not isinstance(metrics, dict) or not isinstance(
+        metrics.get("per_lead_time"), list
+    ):
+        raise ValueError("指标结果必须包含 per_lead_time 列表")
+    if len(metrics["per_lead_time"]) != expected_steps:
+        raise ValueError(
+            "指标的预测步数与 predictions 的 Tout 不一致："
+            f"{len(metrics['per_lead_time'])} != {expected_steps}"
+        )
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="从 predictions.npz 生成序列对比图和指标变化图"
+    )
+    parser.add_argument("predictions", help="predictions.npz 文件路径")
+    parser.add_argument("--metrics", help="可选的 metrics.json 路径")
+    parser.add_argument("--output-dir", help="可选的图片输出目录")
+    parser.add_argument("--experiment-id", help="可选；默认从元数据或父目录读取")
+    parser.add_argument("--prediction-label", default="Model prediction")
+    parser.add_argument("--lead-interval-minutes", type=int, default=6)
+    parser.add_argument("--sample-index", type=int, default=0)
+    parser.add_argument("--channel-index", type=int, default=0)
+    parser.add_argument("--overwrite", action="store_true")
+    args = parser.parse_args(argv)
+
+    paths = make_result_figures_from_file(
+        args.predictions,
+        metrics_path=args.metrics,
+        output_dir=args.output_dir,
+        experiment_id=args.experiment_id,
+        prediction_label=args.prediction_label,
+        lead_interval_minutes=args.lead_interval_minutes,
+        sample_index=args.sample_index,
+        channel_index=args.channel_index,
+        overwrite=args.overwrite,
+    )
+    print(json.dumps(paths, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()
+
