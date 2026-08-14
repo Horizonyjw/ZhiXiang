@@ -1,5 +1,6 @@
 """v0.2 统一评测：灰度 MAE、MSE；CSI、POD、FAR 暂不计算。"""
 
+import argparse
 import csv
 import json
 from pathlib import Path
@@ -12,6 +13,45 @@ import numpy as np
 CLASSIFICATION_METRICS_REASON = (
     "当前缺少完整的 RGB 颜色—回波强度等级色标，无法确定统一的活动回波阈值"
 )
+
+
+def evaluate_file(input_path, output_path=None):
+    """读取 predictions.npz 并评测其中的 predictions 和 targets。
+
+    NPZ 至少必须包含：
+      - predictions: [N, Tout, C, H, W]
+      - targets: [N, Tout, C, H, W]
+
+    output_path 可选；传入 .json 或 .csv 路径时会同时保存结果。
+    """
+    input_path = Path(input_path)
+    if not input_path.is_file():
+        raise FileNotFoundError(f"找不到预测文件：{input_path}")
+    if input_path.suffix.lower() != ".npz":
+        raise ValueError("输入文件必须以 .npz 结尾")
+
+    try:
+        with np.load(input_path, allow_pickle=False) as data:
+            missing = [key for key in ("predictions", "targets") if key not in data]
+            if missing:
+                raise ValueError(
+                    f"NPZ 缺少必需字段：{', '.join(missing)}；"
+                    f"当前字段：{', '.join(data.files)}"
+                )
+            prediction = data["predictions"]
+            target = data["targets"]
+    except (OSError, EOFError) as error:
+        raise ValueError(f"无法读取 NPZ 文件：{input_path}") from error
+
+    if not np.issubdtype(prediction.dtype, np.number):
+        raise ValueError("predictions 必须是数值数组")
+    if not np.issubdtype(target.dtype, np.number):
+        raise ValueError("targets 必须是数值数组")
+
+    metrics = evaluate(prediction, target)
+    if output_path is not None:
+        save_metrics(metrics, output_path)
+    return metrics
 
 
 def evaluate(prediction, target):
@@ -135,3 +175,23 @@ def _check_gray_range(values, name):
         return
     if np.any(finite_values < 0.0) or np.any(finite_values > 1.0):
         raise ValueError(f"{name}必须是 [0,1] 范围内的归一化灰度值")
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="读取 predictions.npz 并计算 v0.2 评测指标"
+    )
+    parser.add_argument("input", help="predictions.npz 文件路径")
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="可选的输出路径，必须以 .json 或 .csv 结尾",
+    )
+    args = parser.parse_args(argv)
+
+    metrics = evaluate_file(args.input, args.output)
+    print(json.dumps(metrics, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

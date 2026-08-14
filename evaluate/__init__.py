@@ -14,5 +14,6 @@ _spec.loader.exec_module(_metrics_v02)
 
 evaluate = _metrics_v02.evaluate
 save_metrics = _metrics_v02.save_metrics
+evaluate_file = getattr(_metrics_v02, "evaluate_file", None)
 
-__all__ = ["evaluate", "save_metrics"]
+__all__ = ["evaluate", "save_metrics", "evaluate_file"]
