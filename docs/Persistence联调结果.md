@@ -1,51 +1,80 @@
 # Persistence 联调结果
 
-> **状态：实现与随机张量接口验证已完成；真实数据联调未执行。**
->
-> Persistence 代码、保存脚本与随机张量前向已就绪。因尚未获得获授权真实雷达连续样例，本文件不登记虚构指标或“联调成功”结论。
+> **状态：radar_v1 handoff 真实前向已跑通（2026-08-14）。**  
+> 对齐队友 [wjh](https://github.com/Horizonyjw/ZhiXiang/tree/wjh) U-Net handoff 联调路径。
 
 ## 1. 联调前置条件
 
-- [ ] 已获得获授权的真实连续雷达样例；
-- [ ] 已确认数据单位、数值范围、缺失值与无回波的定义；
-- [ ] 已确认 Tin、Tout、时间间隔、空间处理与回波阈值；
-- [x] 已实现 Persistence，并以统一输入输出接口通过随机张量检查；
-- [x] 已实现预测保存（`train/run_persistence.py` → `predictions.npz`）；评测读取与可视化仍待对应模块；
-- [ ] 已保存真实数据联调的配置、日志和代码版本。
+- [x] 已获得 `radar_v1/04_handoff/handoff_samples.npz`
+- [x] 数值范围 `[0,1]` 归一化灰度代理（非 dBZ）
+- [x] Tin=5, Tout=3, C=1, H=352, W=512
+- [x] Persistence 统一 5D 接口通过随机张量与真实样本检查
+- [x] 已保存 `predictions.npz`；本地计算灰度 MAE/MSE（评测 v0.2 口径）
+- [ ] CSI / POD / FAR（评测 v0.2 暂不计算）
 
-## 2. 待登记实验信息
+## 2. 实验信息
 
 | 项目 | 实际值 |
 | --- | --- |
-| 实验编号 | 【待真实数据运行后填写】 |
-| 日期与负责人 | 2026-08-09 / Persistence 负责人（代码已就绪） |
-| 数据版本与划分 | 【待实际运行后填写】 |
-| 模型 | Persistence（`models/persistence.py`） |
-| 输入 / 预测设置 | 占位 Tin=5, Tout=5, C=1, H=W=128（待确认） |
-| 回波阈值与单位 | 【待实际运行后填写】 |
-| 运行环境 | 见 `docs/环境安装与启动说明.md` |
-| 推理时长 | 【待真实数据运行后填写】 |
-| MAE / MSE / CSI / POD / FAR | 【待真实数据 + 评测模块后填写】 |
-| 配置、预测、日志、图像位置 | 代码：`configs/persistence_baseline.yaml`；真实结果目录待生成 |
-| 结论与问题 | 真实样例未到位，联调未闭环 |
+| 实验编号 | `20260814-persistence-radar_v1-01` |
+| 日期 | 2026-08-14 |
+| 数据版本 | `radar_v1` |
+| 模型 | Persistence（复制输入最后一帧到 Tout 个未来时刻） |
+| 输入 / 预测 | Tin=5 → Tout=3，C=1，H=352，W=512 |
+| handoff | `radar_v1/04_handoff/handoff_samples.npz`（N=16） |
+| 配置 | `configs/20260814-persistence-radar_v1-01.yaml` |
+| 设备 | CUDA（RTX 5060 Laptop） |
+| 结果目录 | `results/20260814-persistence-radar_v1-01/` |
 
-## 3. 预期结果目录
+## 3. 运行证据
 
-实际联调完成后，结果应按以下结构保存：
+随机张量前向：
 
-~~~text
-results/<experiment_id>/
+```text
+input : (2, 5, 1, 352, 512)
+output: (2, 3, 1, 352, 512)
+forward test OK
+```
+
+真实 handoff 前向：
+
+```text
+inputs : (16, 5, 1, 352, 512) float32
+targets: (16, 3, 1, 352, 512) float32
+pred   : (16, 3, 1, 352, 512) float32
+persistence handoff forward OK
+```
+
+## 4. handoff 灰度误差（评测 v0.2 口径，非 dBZ）
+
+| 范围 | MAE | MSE |
+| --- | ---: | ---: |
+| overall | 1.446e-04 | 3.388e-05 |
+| T+6 min（step 1） | 1.095e-04 | 2.384e-05 |
+| T+12 min（step 2） | 1.500e-04 | 3.480e-05 |
+| T+18 min（step 3） | 1.745e-04 | 4.300e-05 |
+
+说明：指标在 `[0,1]` 灰度上计算；CSI/POD/FAR 未计算。完整数值见 `results/20260814-persistence-radar_v1-01/metrics.json`。
+
+## 5. 命令
+
+```powershell
+# 随机张量
+python -m train.test_persistence_forward
+
+# 真实 handoff（推荐）
+python -m train.test_persistence_handoff
+
+# 等价
+python -m train.run_persistence --config configs/20260814-persistence-radar_v1-01.yaml
+```
+
+## 6. 结果目录
+
+```text
+results/20260814-persistence-radar_v1-01/
 ├── config.yaml
-├── predictions.npz
-├── metrics.json 或 metrics.csv
-├── run.log
-└── figures/
-~~~
-
-真实样本到位后执行：
-
-~~~powershell
-python -m train.run_persistence --npz path/to/real_batch.npz
-~~~
-
-> 未获得真实数据前不创建虚构预测文件、指标数值、图像或“成功”结论。
+├── predictions.npz      # inputs / targets / predictions / metadata_json
+├── metrics.json         # MAE / MSE（overall + per lead time）
+└── summary.json
+```

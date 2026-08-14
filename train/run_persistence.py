@@ -139,13 +139,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="运行 Persistence 并保存预测")
     parser.add_argument(
         "--config",
-        default="configs/persistence_baseline.yaml",
+        default="configs/20260814-persistence-radar_v1-01.yaml",
         help="配置文件路径（相对仓库根目录）",
     )
     parser.add_argument(
         "--npz",
         default=None,
-        help="可选：真实样本 npz，需含 inputs/targets",
+        help="可选：真实样本 npz，需含 inputs/targets；缺省时读配置 handoff_npz",
     )
     args = parser.parse_args()
     cfg_path = Path(args.config)
@@ -153,7 +153,14 @@ def main() -> None:
         cfg_path = repo_root() / cfg_path
     cfg = load_config(cfg_path)
     cfg["_config_path"] = str(cfg_path)
-    npz = Path(args.npz) if args.npz else None
+    if args.npz:
+        npz = Path(args.npz)
+    elif cfg.get("handoff_npz"):
+        npz = Path(cfg["handoff_npz"])
+        if not npz.is_absolute():
+            npz = repo_root() / npz
+    else:
+        npz = None
     run(cfg, npz)
 
 

@@ -1,0 +1,35 @@
+# FNO × radar_v1 handoff 小样本过拟合（真实灰度样本）
+# 对齐 wjh: configs/20260812-unet-radar_v1-01.yaml + overfit_unet_handoff
+
+experiment_id: "20260814-fno-radar_v1-overfit-01"
+model_name: fno
+data_version: radar_v1
+notes: "handoff 真实样本过拟合；未训练权重不得当作正式对比；physical_unit=normalized_grayscale_proxy_NOT_dBZ"
+
+# ---- radar_v1 统一接口 ----
+tin: 5
+tout: 3
+in_channels: 1
+height: 352
+width: 512
+physical_unit: normalized_grayscale_proxy_NOT_dBZ
+
+# ---- FNO 结构 ----
+fno_width: 32
+modes1: 16
+modes2: 16
+n_layers: 4
+
+# ---- 训练（handoff 过拟合）----
+seed: 42
+num_samples: 16
+batch_size: 1
+epochs: 40
+learning_rate: 0.001
+device: auto
+
+# ---- 数据路径（仓库内相对路径）----
+handoff_npz: "radar_v1/04_handoff/handoff_samples.npz"
+
+# ---- 结果保存 ----
+output_dir: "results/20260814-fno-radar_v1-overfit-01"

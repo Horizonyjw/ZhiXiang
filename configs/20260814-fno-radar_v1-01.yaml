@@ -1,0 +1,31 @@
+# FNO × radar_v1 接口联调配置
+# 对齐 wjh radar_v1 接口；本阶段用于 handoff 真实前向，非正式全量训练。
+
+experiment_id: "20260814-fno-radar_v1-01"
+model_name: fno
+data_version: radar_v1
+notes: "handoff 真实前向；physical_unit=normalized_grayscale_proxy_NOT_dBZ"
+
+# ---- radar_v1 统一接口 ----
+tin: 5
+tout: 3
+in_channels: 1
+height: 352
+width: 512
+physical_unit: normalized_grayscale_proxy_NOT_dBZ
+
+# ---- FNO 结构（接口联调默认；正式训练前可再调）----
+fno_width: 32
+modes1: 16
+modes2: 16
+n_layers: 4
+
+# ---- 运行 ----
+seed: 42
+device: auto
+
+# ---- 数据路径 ----
+handoff_npz: "radar_v1/04_handoff/handoff_samples.npz"
+
+# ---- 结果保存 ----
+output_dir: "results/20260814-fno-radar_v1-01"

@@ -1,0 +1,29 @@
+{
+  "experiment_id": "20260814-fno-radar_v1-01",
+  "data_version": "radar_v1",
+  "device": "cuda",
+  "inputs_shape": [
+    16,
+    5,
+    1,
+    352,
+    512
+  ],
+  "targets_shape": [
+    16,
+    3,
+    1,
+    352,
+    512
+  ],
+  "pred_shape": [
+    2,
+    3,
+    1,
+    352,
+    512
+  ],
+  "forward_ok": true,
+  "predictions_untrained": "results/20260814-fno-radar_v1-01/predictions_untrained.npz",
+  "physical_unit": "normalized_grayscale_proxy_NOT_dBZ"
+}

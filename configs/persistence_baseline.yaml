@@ -1,16 +1,18 @@
-# Persistence 基线占位配置
-# Tin/Tout/H/W 为开发占位，待组内确认真实数据设置后替换。
+# Persistence 基线配置（已对齐 radar_v1）
+# 真实 handoff 联调请优先使用：configs/20260814-persistence-radar_v1-01.yaml
 
 experiment_id: "20260809-persistence-placeholder-01"
 model_name: persistence
-notes: "占位配置，用于随机张量前向与预测保存接口验证；不得当作真实数据联调结论"
+data_version: radar_v1
+notes: "默认接口已对齐 radar_v1；随机张量结果不得当作正式联调结论"
 
-# ---- 待组内确认 ----
+# ---- radar_v1 统一接口 ----
 tin: 5
-tout: 5
+tout: 3
 in_channels: 1
-height: 128
-width: 128
+height: 352
+width: 512
+physical_unit: normalized_grayscale_proxy_NOT_dBZ
 
 # ---- 运行 ----
 seed: 42

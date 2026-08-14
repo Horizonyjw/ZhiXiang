@@ -1,0 +1,27 @@
+# Persistence × radar_v1 正式联调配置
+# 对齐 wjh: configs/20260812-unet-radar_v1-01.yaml
+# data_version=radar_v1；数值为归一化灰度代理，不是物理 dBZ。
+
+experiment_id: "20260814-persistence-radar_v1-01"
+model_name: persistence
+data_version: radar_v1
+notes: "handoff 真实前向；physical_unit=normalized_grayscale_proxy_NOT_dBZ"
+
+# ---- radar_v1 统一接口 ----
+tin: 5
+tout: 3
+in_channels: 1
+height: 352
+width: 512
+physical_unit: normalized_grayscale_proxy_NOT_dBZ
+
+# ---- 运行 ----
+seed: 42
+batch_size: 2
+device: auto
+
+# ---- 数据路径 ----
+handoff_npz: "radar_v1/04_handoff/handoff_samples.npz"
+
+# ---- 结果保存 ----
+output_dir: "results/20260814-persistence-radar_v1-01"

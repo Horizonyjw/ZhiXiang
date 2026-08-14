@@ -1,0 +1,35 @@
+{
+  "data_version": "radar_v1",
+  "repository_structure": {
+    "01_raw/radar_png": "7396 original radar PNG files",
+    "02_standardized/frames/train": "standardized train NPY frames",
+    "02_standardized/frames/val": "standardized validation NPY frames",
+    "02_standardized/frames/test": "standardized test NPY frames",
+    "02_standardized": [
+      "standardized_frames.csv",
+      "samples_standardized.csv",
+      "standardization_report.json",
+      "standardization_rejected.csv (only if generated)"
+    ],
+    "03_index": [
+      "frames.csv",
+      "samples.csv",
+      "continuity_breaks.csv",
+      "rejected_frames.csv",
+      "radar_dataset.sqlite"
+    ],
+    "04_handoff": [
+      "handoff_samples.npz"
+    ],
+    "05_metadata": [
+      "quality_report.json",
+      "data_card.json"
+    ],
+    "06_code": [
+      "radar_delivery.py",
+      "standardize_frames.py",
+      "config.json",
+      "requirements.txt"
+    ]
+  }
+}

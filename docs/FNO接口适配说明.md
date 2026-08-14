@@ -1,11 +1,10 @@
 # FNO 接口适配说明（Week1.1）
 
-> **日期**：2026-08-09  
-> **范围**：本阶段不做正式训练，只完成入口定位、维度检查、随机张量前向与适配记录。
+> **日期**：2026-08-09 初稿 / **2026-08-14 真实数据训练更新**  
+> **范围**：接口对齐 + handoff 真实样本过拟合；全量 train 集正式训练仍属下一阶段。  
+> **数据**：统一使用仓库内 `radar_v1`（handoff / 索引）；原始 PNG 由数据侧另行共享，不写入仓库路径配置。
 
 ## 1. 现有代码排查结论
-
-在当前仓库（及本地上级共享目录检索）中：
 
 | 目标 | 结果 |
 | --- | --- |
@@ -14,24 +13,26 @@
 | autoresearch 代码 | **未找到** |
 | 队友 U-Net 模块 | 已存在：`models/unet.py` |
 
-因此本阶段在仓库内新增自包含轻量实现：
+因此新增项目内自包含轻量实现：
 
 - 入口类：`models.fno.RadarFNO`
 - 底层：`FNO2d` / `SpectralConv2d`
-- 前向测试：`python -m train.test_fno_forward`
-- 配置：`configs/fno_baseline.yaml`
+- 随机前向：`python -m train.test_fno_forward`
+- 真实前向：`python -m train.test_fno_handoff`
+- 真实过拟合：`python -m train.overfit_fno_handoff`
+- 配置：`configs/fno_baseline.yaml`、`configs/20260814-fno-radar_v1-overfit-01.yaml`
+- 联调数据：`radar_v1/04_handoff/handoff_samples.npz`
 
-## 2. 输入输出维度
-
-统一公共接口：
+## 2. 输入输出维度（已对齐 radar_v1）
 
 ```text
-输入：[B, Tin, C, H, W]
-输出：[B, Tout, C, H, W]
+输入：[B, 5, 1, 352, 512]
+输出：[B, 3, 1, 352, 512]
 dtype：float32
+数值：[0,1] 归一化灰度代理（非 dBZ）
 ```
 
-`RadarFNO` 内部转换：
+`RadarFNO` 内部：
 
 ```text
 [B, Tin, C, H, W]
@@ -40,47 +41,81 @@ dtype：float32
   -> reshape [B, Tout, C, H, W]
 ```
 
-与 `RadarUNet` 的时间维拼通道策略一致，DataLoader / 评测侧无需为 FNO 单独改公共格式。
+与 Persistence / U-Net 公共格式一致。
 
-## 3. 随机张量前向测试
+## 3. 前向测试记录（2026-08-14 实测）
 
-命令：
+### 3.1 随机张量
 
 ```powershell
 python -m train.test_fno_forward
 ```
 
-检查项：
+```text
+device: cuda
+params: 2102723
+input : (2, 5, 1, 352, 512)
+output: (2, 3, 1, 352, 512)
+forward test OK
+```
 
-- 输出形状等于 `(B, Tout, C, H, W)`
-- 无 NaN / Inf
-- CUDA 可用时在 GPU 上完成一次前向
+### 3.2 真实 handoff 未训练前向（接口验证）
 
-占位默认：`Tin=Tout=5, C=1, H=W=128, fno_width=32, modes=12, n_layers=4`（待组内确认后替换）。  
-配置字段 `fno_width` 表示隐藏通道数，勿与空间尺寸字段 `width` 混淆。
+```powershell
+python -m train.test_fno_handoff
+```
+
+```text
+inputs : (16, 5, 1, 352, 512) float32
+pred   : (2, 3, 1, 352, 512) float32
+fno handoff forward OK
+```
+
+### 3.3 真实 handoff 小样本过拟合（已训练）
+
+数据来源：`radar_v1/04_handoff/handoff_samples.npz`（N=16，标准化真实样本）。
+
+```powershell
+python -m train.overfit_fno_handoff
+```
+
+| 项 | 结果（2026-08-14） |
+| --- | --- |
+| 训练损失 | epoch1 MSE≈6.79e-03 → epoch40 MSE≈2.89e-05（下降） |
+| overall MAE / MSE | ≈3.11e-04 / 2.87e-05 |
+| 产物 | `results/20260814-fno-radar_v1-overfit-01/` |
+
+> 这是 handoff **过拟合**，用于证明可在真实灰度数据上训练；**不是**全量 train/val/test 正式对比。
+
+结构默认：`fno_width=32, modes1=16, modes2=16, n_layers=4`。  
+字段 `fno_width` 是隐藏通道数，勿与空间 `width=512` 混淆。
 
 ## 4. 接口适配情况
 
 | 项目 | 状态 |
 | --- | --- |
 | 统一 5D 接口包装 | 已完成（`RadarFNO`） |
-| 与 Persistence / U-Net 同配置字段风格 | 已完成 |
-| 随机张量前向脚本 | 已完成 |
-| 真实样本前向 | **未完成**（等待 DataLoader / 真实样例） |
-| 训练入口 / 损失 / 优化器 | **未做**（本阶段不做正式训练） |
-| 与评测脚本联通 | **未做** |
+| 与 Persistence / U-Net 同配置风格 | 已完成 |
+| 随机张量前向 | 已完成 |
+| 真实样本前向 | **已完成**（handoff） |
+| handoff 过拟合训练 | **已完成**（`overfit_fno_handoff`） |
+| 全量 DataLoader 训练 | 未做（原始 PNG 路径已接入，待下一阶段） |
+| 与评测脚本联通 | 已导出训练后 `predictions.npz` + `metrics.json` |
 
 ## 5. 第二阶段 FNO 待修改事项
 
-1. **数据接入**：用真实 DataLoader 替换随机张量；确认 Tin/Tout、归一化范围、缺失值掩码是否进入损失。  
-2. **空间尺寸与 modes**：按真实 `H,W` 重设 `modes1/modes2`（通常不超过 `H/2`、`W/2+1`）；检查奇数尺寸与 padding。  
-3. **训练脚手架**：补充 `train/` 下 FNO 小样本过拟合与正式训练入口，复用 `export_predictions`。  
-4. **超参锁定**：`fno_width / n_layers / lr / batch_size` 需与显存和基线对比协议一起确认，不得沿用占位值当正式结论。  
-5. **权重与复数值**：确认跨设备保存/加载（`cfloat` 参数）及混合精度策略。  
-6. **若后续提供外部官方 FNO 仓库**：评估是替换 backbone 还是保留当前包装器；替换时必须保持 5D 公共接口不变。  
-7. **autoresearch**：外部自动实验代码到位后，再把配置读写、指标回传接到统一 `results/<experiment_id>/` 规范。
+1. **数据接入**：用全量 DataLoader（train/val/test）替换 handoff 小样本。  
+2. **modes / 显存**：按 352×512 与 batch 再调 `modes1/modes2`、`fno_width`。  
+3. **训练脚手架**：补充过拟合与正式训练入口，复用 `export_predictions`。  
+4. **超参锁定**：与 Persistence / U-Net 统一对比协议后再定 lr、epochs 等。  
+5. **权重保存**：确认 `cfloat` 参数跨设备加载与混合精度策略。  
+6. **外部官方 FNO**：若后续接入，保持 5D 公共接口不变。  
+7. **autoresearch**：外部自动实验代码到位后再接 `results/<experiment_id>/`。
 
-## 6. 阻塞与协作
+## 6. 协作说明
 
-- 真实雷达连续样例、单位与缺失值定义仍见 `docs/当前问题清单.md`（W1-01～W1-04）。  
-- 在数据未确认前，FNO 只报告接口级前向结果，不报告任何气象技巧评分。
+- 联调与训练入口统一使用仓库内 `radar_v1`（handoff / 索引 / DataLoader 代码）。  
+- 原始 PNG 不提交 Git；全量训练时由成员自行配置本机数据根目录（勿提交含本机盘符的配置）。  
+- 评测 v0.2：灰度 MAE/MSE；CSI/POD/FAR 暂不计算。  
+- Persistence 真实结果见 `docs/Persistence联调结果.md`。  
+- FNO 过拟合结果：`results/20260814-fno-radar_v1-overfit-01/`。

@@ -1,0 +1,33 @@
+{
+  "evaluation_version": "v0.2-local",
+  "data_scale": "normalized_grayscale_[0,1]",
+  "data_version": "radar_v1",
+  "model_name": "fno",
+  "stage": "handoff_overfit",
+  "n_samples": 16,
+  "overall": {
+    "mae": 0.0003112981775908783,
+    "mse": 2.8687824363491317e-05
+  },
+  "per_lead_time": [
+    {
+      "step": 1,
+      "lead_min": 6,
+      "mae": 0.00028014683668073104,
+      "mse": 2.4063172407417613e-05
+    },
+    {
+      "step": 2,
+      "lead_min": 12,
+      "mae": 0.00032592333758995164,
+      "mse": 2.9053377546698214e-05
+    },
+    {
+      "step": 3,
+      "lead_min": 18,
+      "mae": 0.00032782435850195213,
+      "mse": 3.2946923136358126e-05
+    }
+  ],
+  "classification_metrics_status": "not_computed"
+}

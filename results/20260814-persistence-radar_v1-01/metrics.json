@@ -1,0 +1,40 @@
+{
+  "evaluation_version": "v0.2-local",
+  "data_scale": "normalized_grayscale_[0,1]",
+  "data_version": "radar_v1",
+  "model_name": "persistence",
+  "experiment_id": "20260814-persistence-radar_v1-01",
+  "n_samples": 16,
+  "pred_shape": [
+    16,
+    3,
+    1,
+    352,
+    512
+  ],
+  "classification_metrics_status": "not_computed",
+  "overall": {
+    "mae": 0.00014463134400497714,
+    "mse": 3.387655421620443e-05
+  },
+  "per_lead_time": [
+    {
+      "step": 1,
+      "lead_min": 6,
+      "mae": 0.00010945634067366876,
+      "mse": 2.3835709547777306e-05
+    },
+    {
+      "step": 2,
+      "lead_min": 12,
+      "mae": 0.00014995603019343017,
+      "mse": 3.479798137049088e-05
+    },
+    {
+      "step": 3,
+      "lead_min": 18,
+      "mae": 0.0001744816611478325,
+      "mse": 4.299597173034508e-05
+    }
+  ]
+}
