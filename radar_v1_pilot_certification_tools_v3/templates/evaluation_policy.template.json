@@ -1,0 +1,17 @@
+{
+  "data_version": "radar_v1",
+  "scale": "normalized_grayscale_proxy_NOT_dBZ",
+  "lead_times_minutes": [
+    6,
+    12,
+    18
+  ],
+  "activity_threshold": null,
+  "event_thresholds": [],
+  "threshold_source": "evaluation_team_train_only",
+  "status": "pending_evaluation_team_confirmation",
+  "notes": [
+    "Do not derive thresholds from validation or test.",
+    "Do not map dBZ thresholds directly to grayscale proxy until a reliable PNG->dBZ mapping exists."
+  ]
+}

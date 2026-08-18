@@ -1,0 +1,81 @@
+{
+  "dataset_id": "zhixiang_radar",
+  "dataset_version": "radar_v1",
+  "frame_count": 7396,
+  "sample_count": 7302,
+  "split_counts": {
+    "train": 5097,
+    "val": 1472,
+    "test": 733
+  },
+  "manifested_file_count": 13,
+  "manifested_total_size_bytes": 22829479,
+  "files": [
+    {
+      "path": "radar_v1\\02_standardized\\standardized_frames.csv",
+      "size_bytes": 1299621,
+      "sha256": "d80fc7fc6538c77a21aa83ed84f97f54fc4f6c3946d22c4a2ba6dff29d035836"
+    },
+    {
+      "path": "radar_v1\\02_standardized\\samples_standardized.csv",
+      "size_bytes": 4905883,
+      "sha256": "05f959b1de625e4dcaa95d3bee13fefada85ee3103edb82a1bff1b7fb9b2f09e"
+    },
+    {
+      "path": "radar_v1\\03_index\\frames.csv",
+      "size_bytes": 1671447,
+      "sha256": "aa62b97f81e8b80aa0b810a3f41e6a1ae404c59f5d1b9b70e3a2297fc8c3f6c1"
+    },
+    {
+      "path": "radar_v1\\03_index\\samples.csv",
+      "size_bytes": 6572888,
+      "sha256": "51e944f9fb4fd77ad4395770e479dcb3c5c8b7e88bc17f636d12eb2229f8f8cf"
+    },
+    {
+      "path": "radar_v1\\03_index\\continuity_breaks.csv",
+      "size_bytes": 711,
+      "sha256": "02355edfe5980ad74014a08481c37a93801effff82ca3cf8b9d0794f07e29313"
+    },
+    {
+      "path": "radar_v1\\05_metadata\\quality_report.json",
+      "size_bytes": 1417,
+      "sha256": "9878334c8cca3a41bcacbb38dde83e2fc1d282c6b1f5582a481dc35125384aeb"
+    },
+    {
+      "path": "radar_v1\\05_metadata\\data_card.json",
+      "size_bytes": 1557,
+      "sha256": "17a2d82227d226f217ee186262d4540a4aa2b60c869cb8fe98dc7215f16451fc"
+    },
+    {
+      "path": "radar_v1\\04_handoff\\handoff_samples.npz",
+      "size_bytes": 202253,
+      "sha256": "04a9982d1b23551b748bd5819bb8bb69b1dfbf19873a8d920082105dfc34e350"
+    },
+    {
+      "path": "radar_v1\\07_pilot_contract\\frame_manifest.csv",
+      "size_bytes": 1750095,
+      "sha256": "f79993e98f39607317d4eecda380aa3d92960f91758c6f9f4362e6b5ed84f428"
+    },
+    {
+      "path": "radar_v1\\07_pilot_contract\\sample_manifest.csv",
+      "size_bytes": 6419493,
+      "sha256": "dc35a83bf01d0e547e0f67d7bb0a4251e86357a0cd303d456406b433c06bf149"
+    },
+    {
+      "path": "radar_v1\\07_pilot_contract\\split_audit.json",
+      "size_bytes": 1835,
+      "sha256": "90b69c9fa4a05a34ccbcd68c834b11878b9052d9cd732e5ee887d7c76232aa16"
+    },
+    {
+      "path": "radar_v1\\07_pilot_contract\\normalization.json",
+      "size_bytes": 868,
+      "sha256": "693ede7aa7246d7781636834eb1556a6f1185305cfae58f71751156fe622ac25"
+    },
+    {
+      "path": "radar_v1\\07_pilot_contract\\train_intensity_statistics.json",
+      "size_bytes": 1411,
+      "sha256": "bdc1d80eb8f9e7c0b41abc8e6ce2acae8acb07069ce2f197315e65872121d254"
+    }
+  ],
+  "note": "Large standardized/raw radar image payloads may live outside GitHub. This manifest hashes every certification-relevant file accessible under the repository paths listed in pilot_config.json."
+}

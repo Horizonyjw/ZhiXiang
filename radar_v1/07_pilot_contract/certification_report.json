@@ -1,0 +1,22 @@
+{
+  "contract_status": "certified_for_pilot",
+  "checks": {
+    "all_artifacts_exist": true,
+    "preflight_pass": true,
+    "split_audit_pass": true,
+    "train_stats_train_only": true,
+    "test_frozen": true,
+    "formal_physical_claims_false": true,
+    "physical_unit_proxy_not_dbz": true
+  },
+  "artifacts": {
+    "preflight_report.json": true,
+    "frame_manifest.csv": true,
+    "sample_manifest.csv": true,
+    "split_audit.json": true,
+    "normalization.json": true,
+    "train_intensity_statistics.json": true,
+    "data_manifest.json": true,
+    "radar_v1_pilot_data_contract.json": true
+  }
+}

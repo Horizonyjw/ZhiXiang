@@ -1,0 +1,26 @@
+{
+  "source_mode": "RGBA",
+  "pipeline": [
+    "RGBA -> RGB",
+    "RGB / 255",
+    "RGB -> grayscale",
+    "alpha invalid display area -> 0",
+    "resize -> 352x512",
+    "cast -> float32"
+  ],
+  "uses_dataset_statistics": false,
+  "invertible_to_original_png": false,
+  "zero_semantics": "grayscale proxy zero / alpha-invalid area; NOT physical 0 dBZ",
+  "valid_pixel_mask_available": false,
+  "current_valid_pixel_policy": "all standardized pixels are treated as valid unless a future shared mask is introduced",
+  "dataset_id": "zhixiang_radar",
+  "dataset_version": "radar_v1",
+  "output_dtype": "float32",
+  "output_range": [
+    0.0,
+    1.0
+  ],
+  "physical_unit": "normalized_grayscale_proxy_NOT_dBZ",
+  "formal_physical_claims": false,
+  "note": "This file documents the existing radar_v1 preprocessing. It does not reprocess data."
+}

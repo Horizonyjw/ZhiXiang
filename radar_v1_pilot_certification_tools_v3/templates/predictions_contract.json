@@ -1,0 +1,19 @@
+{
+  "required_fields": [
+    "inputs",
+    "targets",
+    "predictions",
+    "metadata_json"
+  ],
+  "inputs_shape": "[N,5,1,352,512]",
+  "targets_shape": "[N,3,1,352,512]",
+  "predictions_shape": "[N,3,1,352,512]",
+  "dtype": "float32",
+  "scale": "[0,1] normalized grayscale proxy",
+  "metadata_must_preserve": [
+    "sample_id",
+    "split",
+    "input_times",
+    "target_times"
+  ]
+}
