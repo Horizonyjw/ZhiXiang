@@ -1,0 +1,31 @@
+evaluation_version: "v1.1"
+dataset_version: "radar_v1"
+
+mask:
+  enabled: false
+  definition: "all_pixels_valid_no_mask"
+
+activity_threshold:
+  enabled: true
+  value: 0.05
+  source: "train_only"
+  meaning: "normalized_grayscale_proxy_activity_NOT_dBZ"
+  selection_rule: "first non-background histogram boundary"
+  source_artifact: "07_pilot_contract/train_intensity_statistics.json"
+  evidence:
+    unique_train_frames: 4964
+    total_train_pixels: 894631936
+    train_nonzero_ratio: 0.0057228216364500544
+    train_ratio_ge_threshold: 0.00547601846397757
+    retained_share_of_nonzero_pixels: 0.956871530770718
+    val_used: false
+    test_used: false
+
+classification_metrics:
+  enabled: true
+  metrics: ["CSI", "POD", "FAR"]
+  event_definition: "value >= activity_threshold"
+  per_horizon_aggregation: "micro_merge_tp_fp_fn"
+  overall_aggregation: "micro_merge_tp_fp_fn_across_horizons"
+  zero_denominator_value: null
+  zero_denominator_status: "undefined_zero_denominator"
