@@ -1,0 +1,57 @@
+{
+  "dataset_id": "zhixiang_radar",
+  "dataset_version": "radar_v1",
+  "radar_root": "radar_v1",
+  "standardized_frames_csv": "radar_v1/02_standardized/standardized_frames.csv",
+  "standardized_samples_csv": "radar_v1/02_standardized/samples_standardized.csv",
+  "raw_frames_csv": "radar_v1/03_index/frames.csv",
+  "raw_samples_csv": "radar_v1/03_index/samples.csv",
+  "continuity_breaks_csv": "radar_v1/03_index/continuity_breaks.csv",
+  "quality_report_json": "radar_v1/05_metadata/quality_report.json",
+  "data_card_json": "radar_v1/05_metadata/data_card.json",
+  "handoff_npz": "radar_v1/04_handoff/handoff_samples.npz",
+  "output_dir": "radar_v1/07_pilot_contract",
+  "expected": {
+    "frame_count": 7396,
+    "sample_count": 7302,
+    "split_counts": {
+      "train": 5097,
+      "val": 1472,
+      "test": 733
+    },
+    "tin": 5,
+    "tout": 3,
+    "channels": 1,
+    "height": 352,
+    "width": 512,
+    "frame_interval_minutes": 6,
+    "frame_interval_tolerance_minutes": 1,
+    "dtype": "float32",
+    "value_range": [
+      0.0,
+      1.0
+    ],
+    "physical_unit": "normalized_grayscale_proxy_NOT_dBZ"
+  },
+  "normalization": {
+    "source_mode": "RGBA",
+    "pipeline": [
+      "RGBA -> RGB",
+      "RGB / 255",
+      "RGB -> grayscale",
+      "alpha invalid display area -> 0",
+      "resize -> 352x512",
+      "cast -> float32"
+    ],
+    "uses_dataset_statistics": false,
+    "invertible_to_original_png": false,
+    "zero_semantics": "grayscale proxy zero / alpha-invalid area; NOT physical 0 dBZ",
+    "valid_pixel_mask_available": false,
+    "current_valid_pixel_policy": "all standardized pixels are treated as valid unless a future shared mask is introduced"
+  },
+  "standardized_train_dir": "radar_v1/02_standardized/frames/train",
+  "standardized_val_dir": "radar_v1/02_standardized/frames/val",
+  "standardized_test_dir": "radar_v1/02_standardized/frames/test",
+  "canonical_frame_index": "radar_v1/03_index/frames.csv",
+  "canonical_sample_index": "radar_v1/03_index/samples.csv"
+}

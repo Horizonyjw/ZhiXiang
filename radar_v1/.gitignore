@@ -8,3 +8,5 @@ Thumbs.db
 *.tmp
 *.temp
 ~$*
+# Local standardized radar frame payloads
+02_standardized/frames/

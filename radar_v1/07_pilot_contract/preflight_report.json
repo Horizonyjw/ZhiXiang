@@ -1,0 +1,68 @@
+{
+  "canonical_sources": {
+    "frames": "radar_v1\\03_index\\frames.csv",
+    "samples": "radar_v1\\03_index\\samples.csv"
+  },
+  "checks": {
+    "all_canonical_required_paths_exist": true,
+    "frame_count": true,
+    "sample_count": true,
+    "split_counts": true,
+    "continuity_breaks_accessible": true
+  },
+  "observed": {
+    "canonical_frame_rows": 7396,
+    "canonical_sample_rows": 7302,
+    "canonical_split_counts": {
+      "train": 5097,
+      "val": 1472,
+      "test": 733
+    },
+    "continuity_break_rows": 13
+  },
+  "standardized_coverage_info": {
+    "standardized_frame_rows": 4964,
+    "frame_split_counts": {
+      "train": 4964
+    },
+    "frame_columns": [
+      "frame_id",
+      "timestamp",
+      "split",
+      "raw_relative_path",
+      "standardized_relative_path",
+      "shape",
+      "dtype",
+      "value_min",
+      "value_max",
+      "center_code",
+      "product_code",
+      "lat_min",
+      "lat_max",
+      "lon_min",
+      "lon_max"
+    ],
+    "standardized_sample_rows": 4884,
+    "sample_split_counts": {
+      "train": 4884
+    },
+    "sample_columns": [
+      "sample_id",
+      "split",
+      "segment_id",
+      "start_time",
+      "end_time",
+      "input_std_paths_json",
+      "target_std_paths_json",
+      "input_times_json",
+      "target_times_json",
+      "center_code",
+      "product_code",
+      "lat_min",
+      "lat_max",
+      "lon_min",
+      "lon_max"
+    ]
+  },
+  "pass": true
+}
